@@ -12,18 +12,11 @@ import csv
 import collections as col
 import numpy as np
 
-import re
-
-
-
-def hello_world(request):
-    return HttpResponse('Hello World!')
-
-def hello_template(request):
+def NBClassify(request):
     #number_of_train_data = {1: 1887, 2: 1982, 3: 1003, 4: 1960, 5: 1939, 6: 1670, 7: 1887, 8: 1619}
-    if request.GET.get('your_name'):
+    if request.GET.get('URL'):
 
-        html = urlopen(request.GET.get('your_name'))
+        html = urlopen(request.GET.get('URL'))
         bsobj = BeautifulSoup(html, 'html.parser')
         alist = list(bsobj.findAll(class_="article"))
         b = []
@@ -78,14 +71,5 @@ def hello_template(request):
         }
         return render((request), 'index.html', d)
     else:
-        return render(request, 'index.html', {'hour': "", 'message': ""})
+        return render(request, 'index.html', {'message': ""})
 
-def hello_get_query(request):
-
-    if request.GET.get('your_name'):
-        d = {
-            'your_name': int(request.GET.get('your_name')) ** 10
-        }
-        return render(request, 'get_query.html', d)
-    else:
-        return render(request, 'get_query.html', {'your_name': ""})
