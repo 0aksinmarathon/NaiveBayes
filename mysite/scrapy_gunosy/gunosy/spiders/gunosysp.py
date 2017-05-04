@@ -28,10 +28,10 @@ class GunosyspSpider(scrapy.Spider):
         yield scrapy.Request(response.urljoin(response.css("div.pager-link-option a::attr(href)").extract_first()), callback=self.parse)
 
     def parse_article(self, response):
-        ngwords = ["(", ")", "（", "）", "[", "]", "１", "２", "３", "４", "５", "６", "７", "８",
-                   "９", "０", "~","～", "-", "ー",  ",", "、", "'", "\"", "/", "\\", "・", ";" "；",
+        ngwords = ["(", ")", "（", "）", "[", "]", "{", "}", "１", "２", "３", "４", "５", "６", "７", "８",
+                   "９", "０", "~","～", "-", "ー",  ",", "、", "'", "\"", "/", "\\", "・", ";", "；",
                    ":", "：", "<", ">", "＜", "＞", "「", "」", "1", "2", "3", "4", "5", "6", "7",
-                   "8", "9", "0", "=", "?", "？"]
+                   "8", "9", "0", "=", "＝", "?", "？", "."]
         t = Tokenizer()
         wordlist = []
         category = response.meta["category"]
