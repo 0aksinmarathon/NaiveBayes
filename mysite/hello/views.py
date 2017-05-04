@@ -53,13 +53,21 @@ def make_article_wordlist(requested_url):
         article_wordlist_before_processed.append(i.get_text())
     joined_article_wordlist_before_processed = "".join(article_wordlist_before_processed)
 
-    #名詞のもののみを抽出、リストの形で返す
+    #名詞でかつNG文字を含まないもののみを抽出、リストの形で返す
+    ngwords = ["(", ")", "（", "）", "[", "]", "１", "２", "３", "４", "５", "６", "７", "８", "９", "０", "~", "～", "-", "ー", ",",
+               "、", "'", "\"", "/", "\\", "・", ";", "；", ":", "：", "<", ">", "＜", "＞", "「", "」", "1", "2", "3", "4",
+               "5", "6", "7", "8", "9", "0", "=", "?", "？"]
     t = Tokenizer()
     tokens = t.tokenize(joined_article_wordlist_before_processed)
     article_wordlist = []
     for token in tokens:
-        partOfSpeech = token.part_of_speech.split(',')[0]
-        if partOfSpeech == '名詞':
+        flag = True
+        for ngword in ngwords:
+            if ngword in  token.surface:
+                flag = False
+        if partOfSpeech == '名詞' and flag:
+            partOfSpeech = token.part_of_speech.split(',')[0]
+
             article_wordlist.append(token.surface)
     return article_wordlist
 
