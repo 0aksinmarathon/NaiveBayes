@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-
+#各カテゴリ30記事(=240記事)について一つ抜き法による精度テストを実施
+#分類精度約85.4%
 
 import csv
 import collections as col
 import numpy as np
 from tqdm import tqdm
-import time
+
 
 def NBClassify():
 
@@ -18,10 +19,8 @@ def NBClassify():
         for l in tqdm(range(attempt)):
             train_data_temp = train_data[k]
             for word in threed[k][l]:
-                try:
-                    train_data[k].remove(word)
-                except:
-                    print("Error")
+                train_data[k].remove(word)
+
 
             #取得URLの記事が各カテゴリに属する事後確率を対数にしたものをリストの形で取得
             log_post_prob_list = calculate_post_prob(train_data, threed[k][l], category_document_number)
@@ -30,7 +29,7 @@ def NBClassify():
             if k == log_post_prob_list.index(max(log_post_prob_list)):
                 count += 1
             number_to_category = {0: "エンタメ", 1: "スポーツ", 2:"おもしろ", 3:"国内", 4: "海外", 5: "コラム", 6: "IT・科学", 7: "グルメ"}
-            print(number_to_category[k], number_to_category[log_post_prob_list.index(max(log_post_prob_list))], count)
+            print("正解:", number_to_category[k], "分類器の分類:", number_to_category[log_post_prob_list.index(max(log_post_prob_list))], "累積正解数:", count)
             train_data[k] = train_data_temp
     print("Precision: " + str(count/(attempt*8)) + "%")
 
@@ -78,7 +77,8 @@ def calculate_post_prob(train_data, article_wordlist, category_document_number):
         log_post_prob_list.append(log_post_prob)
     return log_post_prob_list
 
-NBClassify()
+if __name__ == '__main__':
+    NBClassify()
 
 
 
