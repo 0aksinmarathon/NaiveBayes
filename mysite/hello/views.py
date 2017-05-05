@@ -4,7 +4,6 @@ from django.shortcuts import render
 # Create your views here.
 from django.http.response import HttpResponse
 from django.shortcuts import render
-from datetime import datetime
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 from janome.tokenizer import Tokenizer
