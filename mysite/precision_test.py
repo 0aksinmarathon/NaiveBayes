@@ -13,9 +13,10 @@ def NBClassify():
     #csvファイルから学習データを読み込み
     train_data, category_document_number, threed = draw_train_data_from_csv()
 
-    count = 0
-    attempt = 30
-    for k in tqdm(range(8)):
+    count = 0 #正解数カウント用
+    attempt_done = 0 #終了したテスト試行回数カウント用
+    attempt = 100 #精度テスト試行回数
+    for k in range(8):
         for l in tqdm(range(attempt)):
             train_data_temp = train_data[k]
             for word in threed[k][l]:
@@ -25,13 +26,21 @@ def NBClassify():
             #取得URLの記事が各カテゴリに属する事後確率を対数にしたものをリストの形で取得
             log_post_prob_list = calculate_post_prob(train_data, threed[k][l], category_document_number)
 
-            #事後確率が最大のカテゴリをページに出力
+            #正解であればcount ++
             if k == log_post_prob_list.index(max(log_post_prob_list)):
                 count += 1
+            attempt_done += 1
             number_to_category = {0: "エンタメ", 1: "スポーツ", 2:"おもしろ", 3:"国内", 4: "海外", 5: "コラム", 6: "IT・科学", 7: "グルメ"}
-            print("正解:", number_to_category[k], "分類器の分類:", number_to_category[log_post_prob_list.index(max(log_post_prob_list))], "累積正解数:", count)
+            #事後確率最大のものを回答として出力
+            print("正解:", number_to_category[k], "分類器による分類:", number_to_category[log_post_prob_list.index(max(log_post_prob_list))])
+            print("累積正解数:", count, "", "試行回数: " + str(attempt_done) + "/" + str(attempt * 8) + " ", "暫定正解率:", str(count * 100/attempt_done) + "%")
             train_data[k] = train_data_temp
-    print("Precision: " + str(count/(attempt*8)) + "%")
+    print("精度テスト終了")
+    print("試行回数: " + str(attempt * 8))
+    print("精度: " + str(count * 100/(attempt*8)) + "%")
+
+
+
 
 
 def draw_train_data_from_csv():
@@ -56,6 +65,10 @@ def draw_train_data_from_csv():
     #及び、各カテゴリの学習データ内の記事数のリストを返す
     return (train_data, category_document_number, threed)
 
+
+
+
+
 def calculate_post_prob(train_data, article_wordlist, category_document_number):
     """
     取得URLの記事が各カテゴリに属する事後確率を対数にしたものをリストの形で取得
@@ -68,11 +81,11 @@ def calculate_post_prob(train_data, article_wordlist, category_document_number):
         log_post_prob = 0
 
         #取得URLの文章の各名詞のカテゴリ内における発生頻度を計算、
-        # 各名詞を発生頻度を+1することでゼロ頻度のときの対数関数の発散を防ぐ
+        # 各名詞を発生頻度を+1することでゼロ頻度のときの対数関数の負方向への発散を防ぐ
         for word in article_wordlist:
             log_post_prob += np.log10((counter_train_data[word] + 1) / (len(train_data[k]) + len(set(train_data[k]))))
         #学習したデータとして利用した全記事内で、
-        # k番目のカテゴリの記事の割合を計算、対数に変換して事後確率を対数に変換したものの計算を終了
+        # k番目のカテゴリの記事の割合を計算、対数に変換して足すことで事後確率を対数に変換したものの計算を終了
         log_post_prob += np.log10((category_document_number[k] - 1)/ (sum(category_document_number) - 1))
         log_post_prob_list.append(log_post_prob)
     return log_post_prob_list
